@@ -1,0 +1,65 @@
+* {
+  padding: 0;
+  margin: 0;
+  border: 0;
+  font-family: "Roboto", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  outline: none;
+}
+#startCont {
+  margin-top: 100px;
+  width: 400px;
+  height: 350px;
+  border-radius: 2px;
+  padding-top: 20px;
+}
+#firstChoice {
+  width: 400px;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+#nameInput {
+  text-align: center;
+  height: 19px;
+  min-width: 158px;
+  width: auto;
+  color: #000;
+  border-bottom: 2px solid #808080;
+}
+#drawImg {
+  opacity: 0;
+  z-index: -1;
+  left: 25%;
+  right: 25%;
+  position: absolute;
+  border: 2px solid rgba(0,0,0,0.50);
+  border-radius: 2px;
+}
+.button {
+  color: white;
+  background-color: #2196F3;
+  position: relative;
+  width: 100px;
+  height: 30px;
+  padding: 2px;
+  text-align: center;
+  line-height: 30px;
+  margin: 5px;
+  border-radius: 2px;
+  box-shadow: 0 2px 5px 0 rgba(0,0,0,0.26);
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.button:hover {
+  background-color: #0388ca!important;
+  cursor: pointer;
+  transition: box-shadow .4s cubic-bezier(0.25,0.8,0.25,1),background-color .4s cubic-bezier(0.25,0.8,0.25,1);
+}
+.button:active {
+  background-color: #0276ae!important;
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.4);
+}
