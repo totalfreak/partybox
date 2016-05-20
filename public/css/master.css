@@ -5,6 +5,24 @@
   font-family: "Roboto", sans-serif;
   -webkit-font-smoothing: antialiased;
   outline: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+body {
+  overflow: hidden;
+}
+#lobbyList {
+  opacity: 0;
+  font-size: 18px;
+  -webkit-user-select: all;
+  -moz-user-select: all;
+  -ms-user-select: all;
+  user-select: all;
+}
+#joinGameButt {
+
 }
 #startCont {
   margin-top: 100px;
@@ -18,6 +36,7 @@
   position: absolute;
   display: flex;
   align-items: center;
+  justify-content: center;
   flex-direction: column;
 }
 #nameInput {
@@ -26,7 +45,15 @@
   min-width: 158px;
   width: auto;
   color: #000;
-  border-bottom: 2px solid #808080;
+  margin-bottom: 30px;
+}
+#idInput {
+  text-align: center;
+  height: 19px;
+  min-width: 158px;
+  width: auto;
+  color: #000;
+  margin-bottom: 30px;
 }
 #drawImg {
   opacity: 0;
@@ -36,6 +63,9 @@
   position: absolute;
   border: 2px solid rgba(0,0,0,0.50);
   border-radius: 2px;
+}
+#deleteImg {
+  padding-top: 10px;
 }
 .button {
   color: white;
@@ -53,6 +83,7 @@
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+  transition: box-shadow .4s cubic-bezier(0.25,0.8,0.25,1),background-color .4s cubic-bezier(0.25,0.8,0.25,1);
 }
 .button:hover {
   background-color: #0388ca!important;

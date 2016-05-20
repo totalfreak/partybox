@@ -5,11 +5,18 @@
     <title>Partybox</title>
     <script src="scripts/firebase.js"></script>
     <script src="scripts/jquery-1.8.3.js"></script>
+    <script src="bower_components/paper/dist/paper-full.js"></script>
     <script src="scripts/script.js"></script>
     <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+    <link rel="import" href="bower_components/paper-input/paper-input.html">
+    <link rel="import" href="bower_components/paper-button/paper-button.html">
     <link rel="stylesheet" href="css/master.css" media="screen" title="no title" charset="utf-8">
   </head>
   <body>
+    <div id="lobbyList">
+      Lobby
+      <p></p>
+    </div>
     <center><div id="startCont">
       <h1 font-weight="400">Partybox</h1>
       <br>
@@ -17,16 +24,17 @@
         <canvas id="drawImg" width="350" height="450">
           <p>Your browser doesn't support canvas.</p>
         </canvas>
-    <input maxlength="21" type="text" placeholder="Enter your name" id="nameInput"></input>
+    <paper-input id="nameInput" label="Enter your name" char-counter maxlength="21"></paper-input>
     <br>
-    <div id="startGameButt" class="button">
+    <paper-button raised id="startGameButt">
       Start a game
-    </div>
+    </paper-button>
     <img id="deleteImg" src="css/delete.png" style="opacity: 0">
-    <br><br><br><br>
-    <div id="joinGameButt" class="button">
+    <paper-input label="Enter a room id" id="idInput" char-counter maxlength="5"></paper-input>
+    <br>
+    <paper-button raised id="joinGameButt">
       Join a game
-    </div>
+    </paper-button>
   </div>
   </div></center>
   </body>
