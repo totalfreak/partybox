@@ -72,6 +72,7 @@
     var tool = new Tool();
 		// Define a mousedown and mousedrag handler
 		tool.onMouseDown = function(event) {
+      if(step == 2) {
 			path = new Path();
 			path.strokeColor = myColor;
       path.strokeWidth = 5;
@@ -80,6 +81,7 @@
 		tool.onMouseDrag = function(event) {
 			path.add(event.point);
 		}
+  }
   }
 	}
   function step2() {
@@ -92,7 +94,8 @@
             //if(data.numChildren() <= 3) {
               firebase.database().ref('rooms/' + roomId + '/playerList/' + myName).update({
                 color: myColor,
-                name: myName
+                name: myName,
+                voted: false
               });
             /*} else {
               console.log("Too many players");
@@ -110,18 +113,30 @@
       //creating the room with the give roomId
       firebase.database().ref('rooms/' + roomId + '/playerList/' + myName).update({
         color: myColor,
-        name: myName
+        name: myName,
+        voted: false
       });
       joined = true;
     }
     if(joined) {
       firebase.database().ref('rooms/' + roomId + '/playerList/').orderByChild("name").limitToLast(12).on("child_added", function(snapshot) {
         var data = snapshot.val();
-        $("#lobbyList").text("Lobby - " + roomId);
+        $("#nameInput").prop("disabled", true);
+        $(".lobbyName").text("Lobby - " + roomId);
+        document.title = "Partybox - " + roomId;
+        $("#startGameButt").text("Join");
         var color = data.color;
         var name = data.name;
-        $("#lobbyList").append("<p style='color: "+color+"'>"+name+"</p>");
+        $("#nameList").append("<p class='lobbyPlayerName' id='player_"+name+"' style='color: "+color+"'>"+name+"</p>");
         firebase.database().ref('rooms/' + roomId + '/playerList/' + myName).onDisconnect().remove();
+      });
+      firebase.database().ref('rooms/' + roomId + '/playerList/').orderByChild("name").limitToLast(12).on("child_removed", function(snapshot) {
+        console.log("Removed player number of list");
+        var remove = document.getElementById("player_" + name);
+        $(remove).remove();
+      });
+      $("#startGameButt").click(function() {
+        
       });
     }
   }
