@@ -22,13 +22,15 @@
           $("#startCont").animate({width: 700, height: 700}, {duration: 800, queue: false});
           $("#firstChoice").animate({width: 700, height: 700}, {duration: 800, queue: false});
           $("#drawImg").animate({opacity: 1, top: 0, zIndex: 5}, {duration: 800, queue: false});
-          //$("#idInput").animate({marginTop: 150},{duration: 800, queue: false});
-          $("#idInput").animate({zIndex: -2, opacity: 0},{duration: 800, queue: false});
-          $("#joinGameButt").animate({zIndex: -2, opacity: 0},{duration: 800, queue: false});
-          $("#nameInput").animate({marginTop: 450},{duration: 800, queue: false});
+          $("#idInput").animate({zIndex: -20, opacity: 0},{duration: 800, queue: false});
           $("#lobbyList").animate({opacity: 1},{duration: 800, queue: false});
+          $("#deleteImg").animate({opacity: 1}, {duration: 800, queue: false});
+          $("#startGameButt").animate({marginTop: 370},{duration: 800, queue: false});
+          $("#nameInput").animate({zIndex: -20, opacity: 0},{duration: 800, queue: false});
+          $("#joinGameButt").animate({zIndex: -20, opacity: 0},{duration: 800, queue: false});
           step = 2;
           join = false;
+          voted = false;
           makeId();
           console.log(roomId);
           console.log("You're now at step " + step);
@@ -43,13 +45,12 @@
           $("#startCont").animate({width: 700, height: 700}, {duration: 800, queue: false});
           $("#firstChoice").animate({width: 700, height: 700}, {duration: 800, queue: false});
           $("#drawImg").animate({opacity: 1, top: 0, zIndex: 1}, {duration: 800, queue: false});
-          //$("#idInput").animate({marginTop: 150},{duration: 800, queue: false});
-          $("#idInput").animate({zIndex: -2, opacity: 0},{duration: 800, queue: false});
-          $("#joinGameButt").animate({zIndex: -2, opacity: 0},{duration: 800, queue: false});
-          $("#nameInput").animate({marginTop: 450},{duration: 800, queue: false});
           $("#lobbyList").animate({opacity: 1},{duration: 800, queue: false});
+          $("#deleteImg").animate({opacity: 1}, {duration: 800, queue: false});
+          $("#startGameButt").animate({marginTop: 370},{duration: 800, queue: false});
           step = 2;
           join = true;
+          voted = false;
           roomId = $("#idInput").val();
           console.log(roomId);
           console.log("You're now at step " + step);
@@ -95,7 +96,8 @@
               firebase.database().ref('rooms/' + roomId + '/playerList/' + myName).update({
                 color: myColor,
                 name: myName,
-                voted: false
+                voted: false,
+                votedFor: ""
               });
             /*} else {
               console.log("Too many players");
@@ -110,33 +112,85 @@
       });
       joined = true;
     } else {
-      //creating the room with the give roomId
+      //creating the room with the given roomId
       firebase.database().ref('rooms/' + roomId + '/playerList/' + myName).update({
         color: myColor,
         name: myName,
-        voted: false
+        voted: false,
+        votedFor: ""
+      });
+      firebase.database().ref('rooms/' + roomId + '/votings').update({
+        drawGame: 0
       });
       joined = true;
     }
     if(joined) {
-      firebase.database().ref('rooms/' + roomId + '/playerList/').orderByChild("name").limitToLast(12).on("child_added", function(snapshot) {
+      firebase.database().ref('rooms/' + roomId + '/playerList/').orderByKey().limitToLast(12).on("child_added", function(snapshot) {
         var data = snapshot.val();
         $("#nameInput").prop("disabled", true);
         $(".lobbyName").text("Lobby - " + roomId);
         document.title = "Partybox - " + roomId;
+        $("#idInput").remove();
+        $("#nameInput").remove();
+        $("#joinGameButt").remove();
         $("#startGameButt").text("Join");
         var color = data.color;
-        var name = data.name;
+        name = data.name;
         $("#nameList").append("<p class='lobbyPlayerName' id='player_"+name+"' style='color: "+color+"'>"+name+"</p>");
         firebase.database().ref('rooms/' + roomId + '/playerList/' + myName).onDisconnect().remove();
       });
-      firebase.database().ref('rooms/' + roomId + '/playerList/').orderByChild("name").limitToLast(12).on("child_removed", function(snapshot) {
-        console.log("Removed player number of list");
+      firebase.database().ref('rooms/' + roomId + '/playerList/').on("child_removed", function(snapshot) {
         var remove = document.getElementById("player_" + name);
         $(remove).remove();
+        console.log("Removed player '"+name+"' from the lobbyList");
       });
       $("#startGameButt").click(function() {
-        
+        $("#startCont").animate({top: "110%"},800);
+        $("#startCont").animate({zIndex: -20, opacity: 0},{duration: 800, queue: false});
+        $("#drawGame").animate({top: "25%", bottom: "25%", zIndex: 1, opacity: 1},{duration: 800, queue: false});
+        step = 3;
+        step3();
+      });
+    }
+  }
+  function step3() {
+    if(step == 3) {
+      drawGameVotes = null;
+      //Getting the votecount
+      firebase.database().ref("rooms/" + roomId + "/votings").on("value", function(snapshot) {
+        snapshot = snapshot.val();
+        drawGameVotes = snapshot.drawGame;
+        $("#drawGame").children("paper-badge").attr("label", drawGameVotes);
+        console.log(drawGameVotes);
+      });
+      $(".gameChoice").click(function() {
+        if(!voted) {
+        var clicked = $(this).attr("id");
+        console.log(clicked);
+        var currentVote = $(this).children("paper-badge").attr("label");
+        currentVote = parseInt(currentVote);
+        currentVote+=1;
+        votedFor = clicked;
+        console.log("currentVote is " + currentVote);
+        if(drawGameVotes != null) {
+          firebase.database().ref("rooms/" + roomId + "/votings").update({
+            drawGame: currentVote
+          });
+          firebase.database().ref("rooms/" + roomId + "/playerList/" + myName).update({
+            voted: true,
+            votedFor: clicked
+          });
+          voted = true;
+        }
+      } else {
+        if($(this).attr("id") == clicked) {
+          console.log("Removing one");
+          currentVote-=1;
+          firebase.database().ref("rooms/" + roomId + "/votings").update({
+            drawGame: currentVote
+          });
+        }
+      }
       });
     }
   }
