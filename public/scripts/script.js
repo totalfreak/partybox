@@ -66,7 +66,8 @@
 
 	window.onload = function() {
 		// Get a reference to the canvas object
-		var canvas = document.getElementById('drawImg');
+		canvas = document.getElementById('drawImg');
+    context = canvas.getContext("2d");
 		// Create an empty project and a view for the canvas:
 		paper.setup(canvas);
     with(paper) {
@@ -85,7 +86,21 @@
 			path.add(event.point);
 		}
   }
+  function onResize(event) {
+	// Whenever the window is resized, recenter the path:
+	path.position = view.center;
+}
   }
+  $("#startGameButt").click(function() {
+    if(joined) {
+  myImg = document.getElementById('drawImg').toDataURL();
+  firebase.database().ref('rooms/' + roomId + '/playerList/' + myName).update({
+    image: myImg
+  });
+  console.log(myImg);
+  context.clearRect(0, 0, canvas.width, canvas.height);
+}
+  });
 	}
   function step2() {
     if(join) {
@@ -156,10 +171,6 @@
         step = 3;
         step3();
       });
-    }
-  }
-  function step3() {
-    if(step == 3) {
       //Defining the variables that will be fetched from the database
       drawGameVotes = null;
       readyVotes = null;
@@ -171,8 +182,19 @@
         readyVotes = snapshot.ready;
         $("#drawGame").children("paper-badge").attr("label", drawGameVotes);
         $("#readyButt").children("paper-badge").attr("label", readyVotes);
+        currentReadyVote = $("#readyButt").children("paper-badge").attr("label");
         console.log(drawGameVotes);
       });
+    }
+  }
+  function step3() {
+    if(step == 3) {
+      $("#readyButt").children("paper-badge").change(function() {
+      if($(".lobbyPlayerName").length == $("#readyButt").children("paper-badge").attr("label")) {
+        gameStart = true;
+        gameStarting();
+      }
+    });
       //Getting the current clicked gameChoice, and add/remove your vote from that one
       $(".gameChoice").click(function() {
         if(!voted) {
@@ -204,7 +226,6 @@
           currentReady = $(this).children("paper-badge").attr("label");
           currentReady = parseInt(currentReady);
           currentReady+=1;
-          console.log("current readyVotes is " + currentReady);
           if(readyVotes != null) {
             firebase.database().ref("rooms/" + roomId + "/votings").update({
               ready: currentReady
@@ -212,6 +233,7 @@
             ready = true;
             console.log("Ready state: " + ready);
           }
+          console.log("Number of players " + $(".lobbyPlayerName").length);
         } else {
           currentReady-=1;
           firebase.database().ref("rooms/" + roomId + "/votings").update({
@@ -220,23 +242,30 @@
           ready = false;
           console.log("Ready state: " + ready);
         }
+        if($(".lobbyPlayerName").length == $("#readyButt").children("paper-badge").attr("label")) {
+          gameStart = true;
+          gameStarting();
+        }
       });
-      var currentReadyVote = $("#readyButt").children("paper-badge").attr("label");
-      console.log("Number of players " + $("#nameList .lobbyPlayerName").length);
-      if($("#nameList .lobbyPlayerName").length == currentReadyVote) {
-        gameStart = true;
-        gameStarting();
-      }
     }
+    firebase.database().ref("rooms/" + roomId + "/votings").on("child_changed", function(snapshot) {
+    if($(".lobbyPlayerName").length == $("#readyButt").children("paper-badge").attr("label")) {
+      gameStart = true;
+      gameStarting();
+    }
+  });
   }
   function gameStarting() {
     if(gameStart) {
       console.log("Should start now");
       $("#gamesCont").animate({position: "absolute", top: "110%", opacity: 0, zIndex: -2}, {duration: 800, queue: false, easing: "easeInOutQuart"});
+      $("#gameCont").animate({top: "0", opacity: 1, zIndex: 1}, {duration: 800, queue: false, easing: "easeInOutQuart"});
       round = 1;
-      firebase.database().ref("rooms/" + roomId + "/playerList").on("value", function(snapshot) {
+      firebase.database().ref("rooms/" + roomId + "/playerList").once("value", function(snapshot) {
         data = snapshot.val();
-        console.log(data);
+        for(i in data) {
+          //Make player fetch data, to make actual gameplay, with points and shit
+        }
       });
     }
   }
