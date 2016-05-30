@@ -3,21 +3,48 @@
   <head>
     <meta charset="utf-8">
     <title>Partybox</title>
+    <script src="scripts/firebase.js"></script>
+    <script src="scripts/jquery-1.8.3.js"></script>
+    <script src="bower_components/paper/dist/paper-full.js"></script>
+    <script src="scripts/script.js"></script>
     <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+    <link rel="import" href="bower_components/paper-input/paper-input.html">
+    <link rel="import" href="bower_components/paper-button/paper-button.html">
+    <link rel="import" href="bower_components/paper-material/paper-material.html">
+    <link rel="import" href="bower_components/paper-badge/paper-badge.html">
     <link rel="stylesheet" href="css/master.css" media="screen" title="no title" charset="utf-8">
   </head>
   <body>
-<script src="https://www.gstatic.com/firebasejs/live/3.0/firebase.js"></script>
-<script>
-  // Initialize Firebase
-  var config = {
-    apiKey: "AIzaSyDPd2ml0wXLXE5jX8t11GacNuOGBmF66eA",
-    authDomain: "partybox-68cd8.firebaseapp.com",
-    databaseURL: "https://partybox-68cd8.firebaseio.com",
-    storageBucket: "",
-  };
-  firebase.initializeApp(config);
-</script>
-Grumpy wizards make toxic brew for the evil Queen and Jack.
+    <div id="lobbyList">
+      <p class="lobbyName">Lobby</p>
+      <div id="nameList">
+      </div>
+    </div>
+    <center><div id="startCont">
+      <h1 font-weight="400">Partybox</h1>
+      <br>
+      <div id="firstChoice">
+        <canvas id="drawImg" width="350" height="450">
+          <p>Your browser doesn't support canvas.</p>
+        </canvas>
+    <paper-input id="nameInput" label="Enter your name" char-counter maxlength="21"></paper-input>
+    <br>
+    <paper-button raised id="startGameButt">
+      Start a game
+    </paper-button>
+    <img id="deleteImg" src="css/delete.png" style="opacity: 0">
+    <paper-input label="Enter a room id" id="idInput" char-counter maxlength="5"></paper-input>
+    <br>
+    <paper-button raised id="joinGameButt">
+      Join a game
+    </paper-button>
+  </div>
+  </div></center>
+  <div id="gamesCont">
+    <paper-button raised class="gameChoice" id="drawGame">
+      Draw sum shit
+      <paper-badge label="0"></paper-badge>
+    </paper-button>
+  </div>
   </body>
 </html>
