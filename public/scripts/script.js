@@ -31,6 +31,7 @@
           step = 2;
           join = false;
           voted = false;
+          ready = false;
           makeId();
           console.log(roomId);
           console.log("You're now at step " + step);
@@ -51,6 +52,7 @@
           step = 2;
           join = true;
           voted = false;
+          ready = false;
           roomId = $("#idInput").val();
           console.log(roomId);
           console.log("You're now at step " + step);
@@ -97,7 +99,8 @@
                 color: myColor,
                 name: myName,
                 voted: false,
-                votedFor: ""
+                votedFor: "",
+                points: 0
               });
             /*} else {
               console.log("Too many players");
@@ -117,10 +120,12 @@
         color: myColor,
         name: myName,
         voted: false,
-        votedFor: ""
+        votedFor: "",
+        points: 0
       });
       firebase.database().ref('rooms/' + roomId + '/votings').update({
-        drawGame: 0
+        drawGame: 0,
+        ready: 0
       });
       joined = true;
     }
@@ -147,7 +152,7 @@
       $("#startGameButt").click(function() {
         $("#startCont").animate({top: "110%"},800);
         $("#startCont").animate({zIndex: -20, opacity: 0},{duration: 800, queue: false});
-        $("#drawGame").animate({top: "25%", bottom: "25%", zIndex: 1, opacity: 1},{duration: 800, queue: false});
+        $("#drawGame").animate({top: "25%", bottom: "25%", zIndex: 1, opacity: 1},{duration: 800, queue: false, easing: "easeInOutQuart"});
         step = 3;
         step3();
       });
@@ -155,19 +160,25 @@
   }
   function step3() {
     if(step == 3) {
+      //Defining the variables that will be fetched from the database
       drawGameVotes = null;
+      readyVotes = null;
+      gameStart = false;
       //Getting the votecount
       firebase.database().ref("rooms/" + roomId + "/votings").on("value", function(snapshot) {
         snapshot = snapshot.val();
         drawGameVotes = snapshot.drawGame;
+        readyVotes = snapshot.ready;
         $("#drawGame").children("paper-badge").attr("label", drawGameVotes);
+        $("#readyButt").children("paper-badge").attr("label", readyVotes);
         console.log(drawGameVotes);
       });
+      //Getting the current clicked gameChoice, and add/remove your vote from that one
       $(".gameChoice").click(function() {
         if(!voted) {
         var clicked = $(this).attr("id");
         console.log(clicked);
-        var currentVote = $(this).children("paper-badge").attr("label");
+        currentVote = $(this).children("paper-badge").attr("label");
         currentVote = parseInt(currentVote);
         currentVote+=1;
         votedFor = clicked;
@@ -176,21 +187,56 @@
           firebase.database().ref("rooms/" + roomId + "/votings").update({
             drawGame: currentVote
           });
-          firebase.database().ref("rooms/" + roomId + "/playerList/" + myName).update({
-            voted: true,
-            votedFor: clicked
-          });
           voted = true;
+          $("#readyButt").animate({top: "70%", zIndex: 1, opacity: 1},{duration: 800, queue: false, easing: "easeInOutQuart"});
         }
       } else {
-        if($(this).attr("id") == clicked) {
           console.log("Removing one");
           currentVote-=1;
           firebase.database().ref("rooms/" + roomId + "/votings").update({
             drawGame: currentVote
           });
-        }
+          voted = false;
       }
+      });
+      $("#readyButt").click(function() {
+        if(!ready) {
+          currentReady = $(this).children("paper-badge").attr("label");
+          currentReady = parseInt(currentReady);
+          currentReady+=1;
+          console.log("current readyVotes is " + currentReady);
+          if(readyVotes != null) {
+            firebase.database().ref("rooms/" + roomId + "/votings").update({
+              ready: currentReady
+            });
+            ready = true;
+            console.log("Ready state: " + ready);
+          }
+        } else {
+          currentReady-=1;
+          firebase.database().ref("rooms/" + roomId + "/votings").update({
+            ready: currentReady
+          });
+          ready = false;
+          console.log("Ready state: " + ready);
+        }
+      });
+      var currentReadyVote = $("#readyButt").children("paper-badge").attr("label");
+      console.log("Number of players " + $("#nameList .lobbyPlayerName").length);
+      if($("#nameList .lobbyPlayerName").length == currentReadyVote) {
+        gameStart = true;
+        gameStarting();
+      }
+    }
+  }
+  function gameStarting() {
+    if(gameStart) {
+      console.log("Should start now");
+      $("#gamesCont").animate({position: "absolute", top: "110%", opacity: 0, zIndex: -2}, {duration: 800, queue: false, easing: "easeInOutQuart"});
+      round = 1;
+      firebase.database().ref("rooms/" + roomId + "/playerList").on("value", function(snapshot) {
+        data = snapshot.val();
+        console.log(data);
       });
     }
   }

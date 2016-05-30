@@ -83,6 +83,19 @@ body {
   position: absolute;
   top: 110%;
   left: 20%;
+  opacity: 0;
+}
+#readyButt {
+  width: 175px;
+  height: 75px;
+  font-size: 22px;
+  text-align: center;
+  line-height: 50px;
+  position: absolute;
+  cursor: pointer;
+  top: 110%;
+  left: 40%;
+  opacity: 0;
 }
 .button {
   color: white;
